@@ -34,7 +34,7 @@ def receive_message():
                 response_sent_text = input("""welcome to fide chatbot ,How can I help you?
                                         1.GET RIDE
                                         2.SUPPORT 
-                                        3.RATE US """
+                                        3.RATE US """)
 
                 if message['message'].get('text')=="Support" or message['message'].get('text')=="SUPPORT":
                     response_sent_text = "click on the url"
