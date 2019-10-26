@@ -1,0 +1,25 @@
+(myenv) C:\Users\ASUS\Desktop\ELTE\SOFTWARE_TECHNOLOGY\myenv\Scripts>python aibot.py
+ * Serving Flask app "aibot" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: on
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 204-941-891
+ * Running on http://127.0.0.1:80/ (Press CTRL+C to quit)
+ * Detected change in 'C:\\Users\\ASUS\\Desktop\\ELTE\\SOFTWARE_TECHNOLOGY\\myenv\\Scripts\\aibot.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 204-941-891
+ * Running on http://127.0.0.1:80/ (Press CTRL+C to quit)
+ * Detected change in 'C:\\Users\\ASUS\\Desktop\\ELTE\\SOFTWARE_TECHNOLOGY\\myenv\\Scripts\\aibot.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 204-941-891
+ * Running on http://127.0.0.1:80/ (Press CTRL+C to quit)
+ * Detected change in 'C:\\Users\\ASUS\\Desktop\\ELTE\\SOFTWARE_TECHNOLOGY\\myenv\\Scripts\\aibot.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 204-941-891
+ * Running on http://127.0.0.1:80/ (Press CTRL+C to quit)
