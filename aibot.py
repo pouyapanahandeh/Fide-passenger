@@ -46,9 +46,13 @@ def receive_message():
                 if message['message'].get('text')=="rate us":
                     response_sent_text = "thanks for your your time"
                     send_message(recipient_id, response_sent_text)
-                #if user sends us a GIF, photo,video, or any other non-text item
+                #if user sends us a GIF,emoji photo,video, or any other non-text item
                 if message['message'].get('attachments'):
-                    response_sent_nontext = "wrong input please choose an option"
+                    response_sent_nontext = """wrong input please choose an option,
+                                           input("""welcome to fide chatbot ,How can I help you?
+                                        1.GET RIDE
+                                        2.SUPPORT 
+                                        3.RATE US """
                     
                     send_message(recipient_id, response_sent_nontext)
     return "Message Processed"
