@@ -37,10 +37,10 @@ def receive_message():
                                         2.SUPPORT 
                                         3.RATE US """
 
-                if message['message'].get('text')=="Support":
+                if message['message'].get('text')=="Support" or message['message'].get('text')=="SUPPORT":
                     response_sent_text = "click on the url"
                     send_message(recipient_id, response_sent_text)
-                if message['message'].get('text')=="get a ride":
+                if message['message'].get('text')=="get ride a" message['message'].get('text')=="GET RIDE":
                     response_sent_text = "please share your location"
                     send_message(recipient_id, response_sent_text)
                 if message['message'].get('text')=="rate us":
