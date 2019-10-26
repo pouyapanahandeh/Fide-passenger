@@ -6,7 +6,6 @@ from pymessenger.bot import Bot
 from Tkinter import *
 
 root = Tk()
-var = StringVar()
 
 app = Flask(__name__)
 ACCESS_TOKEN = 'ACCESS_TOKEN'
