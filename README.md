@@ -13,7 +13,7 @@ STEP 5:
 create your own virutal python environment using "virtualenv" (pip install virtualenv)
 install - flask, requests, pymessanger
 STEP  6 :
-Run the complete code( App.py) in any python enviornment or in cmd(python app.py) ,while the app.py is running in the environment open facebook page(fide passenger) to interact with the bot and check if it is responding or not.
+Run the complete code( App.py) in any python platform or in cmd(python app.py) ,while the app.py is running in the environment open facebook page(fide passenger) to interact with the bot and check if it is responding or not.
    
    
    ACCESS_TOKEN="EAAH7stflgWoBAOz4vFti6nYyWrzIovF9fi78B554kFqE5MNXZAW8fiY5uxgRxdMHP5fyA3dBzCmqFJqtRuK26ccPPYCFqDlZAYKfO5AXykv9B5x70NFLZAiOBQmrdNc8XW6208Ti9n4Bh7eKGBt4t8GZCPlzA1Gn9DKRbtT7EgZDZD"
