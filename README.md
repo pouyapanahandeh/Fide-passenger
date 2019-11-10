@@ -1,11 +1,17 @@
 # Fide Passenger
 
 ### HOW TO RUN Fide-passenger
+
 STEP 1 : create facebook app(appid).
+
 STEP 2 : create facebook page named "fide passenger".
+
 STEP 3 : create token for "fide passenger" to connect with "appid".
+
 STEP 4 : set up the web hook (at port 80) ( I used python coding in spyder environment for this, but it can be done using node.js as well)verification code for webhook run flask app using ngrok(local server) to check if the webhook is connected and working in the local server.
+
 STEP 5 : create your own virutal python environment using "virtualenv" (pip install virtualenv)install - flask, requests, pymessanger.
+
 STEP 6 : Run the complete code( App.py) in any python platform or in cmd(python app.py), while the app.py is running in the environment open facebook page(fide passenger) to interact with the bot and check if it is responding or not.
    
    
