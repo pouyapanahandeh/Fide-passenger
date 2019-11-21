@@ -39,50 +39,6 @@ app.post('/webhook', (req, res) => {
       
     });
 
-    function callSendAPI(sender_psid, response) {
-      // Construct the message body
-      let request_body = {
-        "recipient": {
-          "id": sender_psid
-        },
-        "message": response
-      }
-      console.log("----------------------------------");
-      console.log(request_body);
-    
-      // Send the HTTP request to the Messenger Platform
-      request({
-        "uri": "https://graph.facebook.com/v2.6/me/messages",
-        "qs": { "access_token": PAGE_ACCESS_TOKEN },
-        "method": "POST",
-        "json": request_body
-      }, (err, res, body) => {
-        if (!err) {
-          console.log('message sent!')
-        } else {
-          console.error("Unable to send message:" + err);
-        }
-      }); 
-    }
-
-    function handleMessage(sender_psid, received_message) {
-
-      let response;
-    
-      // Check if the message contains text
-      if (received_message.text) {    
-    
-        // Create the payload for a basic text message
-        response = {
-          "text": "welcome to fide-passenger-bot.How can I help you"
-        }
-      }  
-      
-      // Sends the response message
-      callSendAPI(sender_psid, response);  
-      console.log(response);  
-    }
-
     // Returns a '200 OK' response to all requests
     res.status(200).send('EVENT_RECEIVED');
   } else {
@@ -118,3 +74,88 @@ app.get('/webhook', (req, res) => {
     }
   }
 });
+
+function callSendAPI(sender_psid, response) {
+  // Construct the message body
+  let request_body = {
+    "recipient": {
+      "id": sender_psid
+    },
+    "message": response
+  }
+  console.log("----------------------------------");
+  console.log(request_body);
+
+  // Send the HTTP request to the Messenger Platform
+  request({
+    "uri": "https://graph.facebook.com/v2.6/me/messages",
+    "qs": { "access_token": PAGE_ACCESS_TOKEN },
+    "method": "POST",
+    "json": request_body
+  }, (err, res, body) => {
+    if (!err) {
+      console.log('message sent!')
+    } else {
+      console.error("Unable to send message:" + err);
+    }
+  }); 
+}
+
+function handleMessage(sender_psid, received_message) {
+
+  let response;
+
+  // Check if the message contains text
+  if (received_message.text) {    
+
+    // Create the payload for a basic text message
+    response = {
+      "attachment": {
+        "type": "template",
+        "payload": {
+          "template_type": "generic",
+          "elements": [{
+            "title": "Welcome to Fide Passenger Bot. How can I help you",
+            "subtitle": "Welcome to Fide Passenger Bot. How can I help you",
+            "buttons": [
+              {
+                "type": "postback",
+                "title": "Get support",
+                "payload": "get-support",
+              },
+              {
+                "type": "postback",
+                "title": "Get a ride",
+                "payload": "get-ride",
+              }
+            ],
+          }]
+        }
+      }
+    }
+  }  
+  
+  // Sends the response message
+  callSendAPI(sender_psid, response);  
+  console.log(response);  
+}
+
+function handlePostback(sender_psid, received_message) {
+
+  let response = {
+    "text": ""
+  };
+
+  switch(received_message.payload) {
+    case "get-support":
+      response.text = "https://www.facebook.com/fidesupport/";
+      break;
+    case "get-ride":
+      response.text = "enter your current location";
+      break;
+  }
+
+  // Sends the response message
+  callSendAPI(sender_psid, response);  
+  console.log(response);
+}
