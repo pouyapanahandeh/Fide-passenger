@@ -164,6 +164,9 @@ function handlePostback(sender_psid, received_message) {
       response.text = "enter your current location";
       break;
   }
+    response.quick_replies = [{
+    "content_type":"location"
+  }];
 
   // Sends the response message
   callSendAPI(sender_psid, response);  
