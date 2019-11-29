@@ -161,12 +161,10 @@ function handlePostback(sender_psid, received_message) {
       response.text = "https://www.facebook.com/fidesupport/";
       break;
     case "get-ride":
-      response.text = "enter your current location";
+      response.text = "Enter your current location:";
+      stage = 1;
       break;
   }
-    response.quick_replies = [{
-    "content_type":"location"
-  }];
 
   // Sends the response message
   callSendAPI(sender_psid, response);  
