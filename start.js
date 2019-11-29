@@ -25,9 +25,19 @@ app.post('/webhook', (req, res) => {
       let webhook_event = entry.messaging[0];
       console.log(webhook_event);
     
-      // Get the sender PSID
+     / Get the sender PSID
       let sender_psid = webhook_event.sender.id;
       console.log('Sender PSID: ' + sender_psid);
+      // console.log("IP: " + req.ip);
+      
+      // // var ip = "207.97.227.239";
+      // let geo = geoip.lookup(req.ip);
+      // console.log(geo);
+
+      // console.log("------------------------------------------------------");
+      console.log("req.headers['x-forwarded-for']: " + req.headers['x-forwarded-for']);
+      console.log("req.connection.remoteAddress: " + req.connection.remoteAddress);
+      console.log("req.socket.remoteAddress: " + req.socket.remoteAddress);
     
       // Check if the event is a message or postback and
       // pass the event to the appropriate handler function
