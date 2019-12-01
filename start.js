@@ -1,4 +1,4 @@
-'use strict';
+// 'use strict';
 
 // Imports dependencies and set up http server
 const
@@ -7,7 +7,9 @@ const
   app = express().use(bodyParser.json()); // creates express http server
 const request = require('request');
 
-  const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
+var geoip = require('geoip-lite');
+
+const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
 // Sets server port and logs message on success
 app.listen(process.env.PORT || 80, () => console.log('webhook is listening'));
@@ -23,9 +25,8 @@ app.post('/webhook', (req, res) => {
 
       // Gets the body of the webhook event
       let webhook_event = entry.messaging[0];
-      console.log(webhook_event);
     
-     / Get the sender PSID
+      // Get the sender PSID
       let sender_psid = webhook_event.sender.id;
       console.log('Sender PSID: ' + sender_psid);
       // console.log("IP: " + req.ip);
@@ -35,9 +36,10 @@ app.post('/webhook', (req, res) => {
       // console.log(geo);
 
       // console.log("------------------------------------------------------");
-      console.log("req.headers['x-forwarded-for']: " + req.headers['x-forwarded-for']);
-      console.log("req.connection.remoteAddress: " + req.connection.remoteAddress);
-      console.log("req.socket.remoteAddress: " + req.socket.remoteAddress);
+      // console.log("req.headers['x-forwarded-for']: " + req.headers['x-forwarded-for']);
+      // console.log("req.connection.remoteAddress: " + req.connection.remoteAddress);
+      // console.log("req.socket.remoteAddress: " + req.socket.remoteAddress);
+      // console.log("req.connection.socket.remoteAddress: " + req.connection.socket.remoteAddress);
     
       // Check if the event is a message or postback and
       // pass the event to the appropriate handler function
@@ -46,7 +48,7 @@ app.post('/webhook', (req, res) => {
       } else if (webhook_event.postback) {
         handlePostback(sender_psid, webhook_event.postback);
       }
-      
+
     });
 
     // Returns a '200 OK' response to all requests
@@ -93,8 +95,6 @@ function callSendAPI(sender_psid, response) {
     },
     "message": response
   }
-  console.log("----------------------------------");
-  console.log(request_body);
 
   // Send the HTTP request to the Messenger Platform
   request({
@@ -111,59 +111,57 @@ function callSendAPI(sender_psid, response) {
   }); 
 }
 
+var stage = [];
+
 function handleMessage(sender_psid, received_message) {
 
   let response;
 
-  // Check if the message contains text
-  if (received_message.text) {    
-
-    // Create the payload for a basic text message
-    response = {
-      "attachment": {
-        "type": "template",
-        "payload": {
-          "template_type": "generic",
-          "elements": [{
-            "title": "Welcome to Fide Passenger Bot. How can I help you",
-            "subtitle": "Welcome to Fide Passenger Bot. How can I help you",
-            "buttons": [
-              {
-                "type": "postback",
-                "title": "Get support",
-                "payload": "get-support",
-              },
-              {
-                "type": "postback",
-                "title": "Get a ride",
-                "payload": "get-ride",
-              }
-            ],
-          }]
-        }
+  // Create the payload for a basic text message
+  response = {
+    "attachment": {
+      "type": "template",
+      "payload": {
+        "template_type": "generic",
+        "elements": [{
+          "title": "Welcome to Fide Passenger Bot. How can I help you",
+          "subtitle": "Welcome to Fide Passenger Bot. How can I help you",
+          "buttons": [
+            {
+              "type": "postback",
+              "title": "Get support",
+              "payload": "get-support",
+            },
+            {
+              "type": "postback",
+              "title": "Get a ride",
+              "payload": "get-ride",
+            }
+          ],
+        }]
       }
     }
-  }  
+  }
+
+  switch(stage[sender_psid]) {
+    case 1:
+      response = {
+        "text": "Thank you,now we have your location,please enter your destination?"
+      };
+      stage[sender_psid] = 2;
+      break;
+    case 2:
+      response = {
+        "text": "Please wait we are trying to find a driver for you nearby."
+      }
+      stage[sender_psid] = 3;
+      break;
+    
+  }
   
   // Sends the response message
-  callSendAPI(sender_psid, response);  
-  console.log(response);  
+  callSendAPI(sender_psid, response);
 }
-
-app.dialog('/getUserLocation', [
-    function (session){
-        builder.Prompts.text(session, "Send me your current location.");
-    },
-    function (session) {
-        if(session.message.entities.length != 0){
-            session.userData.lat = session.message.entities[0].geo.latitude;
-            session.userData.lon = session.message.entities[0].geo.longitude;
-            session.endDialog();
-        }else{
-            session.endDialog("Sorry, I didn't get your location.");
-        }
-    }
-]);
 
 function handlePostback(sender_psid, received_message) {
 
@@ -175,19 +173,12 @@ function handlePostback(sender_psid, received_message) {
     case "get-support":
       response.text = "https://www.facebook.com/fidesupport/";
       break;
-    //case "get-ride":
-      //response.text = "Enter your current location:";
-      //stage = 1;
-      //break;
+    case "get-ride":
+      response.text = "Enter your current location:";
+      stage[sender_psid] = 1;
+      break;
   }
-  function (session){
-    var data = { method: "sendMessage", parameters: { text: "<b>Save time by sending us your current location.</b>", parse_mode: "HTML", reply_markup: { keyboard: [ [ { text: "Share location", request_location: true } ] ] } } };
-    const message = new builder.Message(session);
-    message.setChannelData(data);
-    session.send(message);
-},
 
   // Sends the response message
-  callSendAPI(sender_psid, response);  
-  console.log(response);
+  callSendAPI(sender_psid, response);
 }
