@@ -150,6 +150,21 @@ function handleMessage(sender_psid, received_message) {
   console.log(response);  
 }
 
+app.dialog('/getUserLocation', [
+    function (session){
+        builder.Prompts.text(session, "Send me your current location.");
+    },
+    function (session) {
+        if(session.message.entities.length != 0){
+            session.userData.lat = session.message.entities[0].geo.latitude;
+            session.userData.lon = session.message.entities[0].geo.longitude;
+            session.endDialog();
+        }else{
+            session.endDialog("Sorry, I didn't get your location.");
+        }
+    }
+]);
+
 function handlePostback(sender_psid, received_message) {
 
   let response = {
@@ -160,11 +175,17 @@ function handlePostback(sender_psid, received_message) {
     case "get-support":
       response.text = "https://www.facebook.com/fidesupport/";
       break;
-    case "get-ride":
-      response.text = "Enter your current location:";
-      stage = 1;
-      break;
+    //case "get-ride":
+      //response.text = "Enter your current location:";
+      //stage = 1;
+      //break;
   }
+  function (session){
+    var data = { method: "sendMessage", parameters: { text: "<b>Save time by sending us your current location.</b>", parse_mode: "HTML", reply_markup: { keyboard: [ [ { text: "Share location", request_location: true } ] ] } } };
+    const message = new builder.Message(session);
+    message.setChannelData(data);
+    session.send(message);
+},
 
   // Sends the response message
   callSendAPI(sender_psid, response);  
