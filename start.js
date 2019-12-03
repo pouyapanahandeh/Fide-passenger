@@ -182,3 +182,42 @@ function handlePostback(sender_psid, received_message) {
   // Sends the response message
   callSendAPI(sender_psid, response);
 }
+
+//creating database Fide-passenger
+var pgtools = require("pgtools");
+const config = {
+  user: "postgres",
+  host: "localhost",
+  password: "antikadas",
+  port: 5432
+};
+
+const express = require('express');
+const app = express();
+const uuid = require('uuid');
+const Pool = require('pg').Pool;
+const port = 3000;
+app.listen(port, () => console.log('App listening on port ', port));
+
+let pool;
+try {
+    pool = new Pool({
+      user: 'postgres',
+      host: 'localhost',
+      database: 'Fide_passenger1',
+      password: 'antikadas',
+      port: 5432,
+    })
+    pool.query("CREATE TABLE IF NOT EXISTS posts (id VARCHAR(100) PRIMARY KEY,current_locaton VARCHAR(30),VARCHAR(30)");
+    //pool.query('INSERT INTO posts (id, room, temp, humidity, time) VALUES ($1, $2, $3, $4, $5)', [uuid.v1(), 1, 30, 40, 2019-04-20], (error, results) => {
+        if (error) {
+          throw error
+        } else {
+          console.log(results);
+        }
+    
+} 
+catch (e) {
+    console.log(e)
+}
+
