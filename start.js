@@ -184,40 +184,36 @@ function handlePostback(sender_psid, received_message) {
 }
 
 //creating database Fide-passenger
-var pgtools = require("pgtools");
+const pg = require('pg');
+
 const config = {
-  user: "postgres",
-  host: "localhost",
-  password: "antikadas",
-  port: 5432
+  user: 'postgres',
+  database: 'F',
+  password: 'antikadas',
+  port: 5432                  //Default port, change it if needed
 };
 
-const express = require('express');
-const app = express();
-const uuid = require('uuid');
-const Pool = require('pg').Pool;
-const port = 3000;
-app.listen(port, () => console.log('App listening on port ', port));
+const pool = new pg.Pool(config);
 
-let pool;
-try {
-    pool = new Pool({
-      user: 'postgres',
-      host: 'localhost',
-      database: 'Fide_passenger1',
-      password: 'antikadas',
-      port: 5432,
-    })
-    pool.query("CREATE TABLE IF NOT EXISTS posts (id VARCHAR(100) PRIMARY KEY,current_locaton VARCHAR(30),destination VARCHAR(30)");
-    //pool.query('INSERT INTO posts (id, room, temp, humidity, time) VALUES ($1, $2, $3, $4, $5)', [uuid.v1(), 1, 30, 40, 2019-04-20], (error, results) => {
-        if (error) {
-          throw error
-        } else {
-          console.log(results);
-        }
-    
-} 
-catch (e) {
-    console.log(e)
-}
+app.post('/data', (req, res, next) => {
+  const user = req.body
+
+   pool.connect(function (err, client, done) {
+       if (err) {
+           console.log("Can not connect to the DB" + err);
+       }
+       client.query('INSERT INTO data (id, current_location,destination) VALUES (sender_psid);', [user.name], function (err, result) {
+            done();
+            if (err) {
+                console.log(err);
+                res.status(400).send(err);
+            }
+            res.status(200).send(result.rows);
+       })
+   })
+});
+
+app.listen(4000, function () {
+    console.log('Server is running.. on Port 4000');
+});
 
