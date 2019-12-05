@@ -6,8 +6,15 @@ const
   bodyParser = require('body-parser'),
   app = express().use(bodyParser.json()); // creates express http server
 const request = require('request');
+const { Client } = require('pg');
 
-var geoip = require('geoip-lite');
+const client = new Client({
+  user: 'wcyxlfvjultpeh',
+  host: 'ec2-54-247-82-14.eu-west-1.compute.amazonaws.com',
+  database: 'ddd5fleaueoj2k',
+  password: '143af35a27f1fd44fc325947ea1e1c86195a56f1dd80e673113c55bc2ff7238f',
+  port: 5432
+});
 
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
@@ -48,7 +55,6 @@ app.post('/webhook', (req, res) => {
       } else if (webhook_event.postback) {
         handlePostback(sender_psid, webhook_event.postback);
       }
-
     });
 
     // Returns a '200 OK' response to all requests
@@ -112,6 +118,7 @@ function callSendAPI(sender_psid, response) {
 }
 
 var stage = [];
+var data = [];
 
 function handleMessage(sender_psid, received_message) {
 
@@ -143,20 +150,37 @@ function handleMessage(sender_psid, received_message) {
     }
   }
 
+  console.log("*********** RESPONSE ***********");
+  console.log(received_message);
   switch(stage[sender_psid]) {
     case 1:
+      data[sender_psid].location = received_message.text;
       response = {
-        "text": "Thank you,now we have your location,please enter your destination?"
+        "text": "Thank you,now we have your location, please enter your destination?"
       };
       stage[sender_psid] = 2;
       break;
     case 2:
+      data[sender_psid].destination = received_message.text;
       response = {
         "text": "Please wait we are trying to find a driver for you nearby."
       }
       stage[sender_psid] = 3;
+
+      client.connect();
+      const query_str = 'INSERT INTO public."passenger-feed"('+
+        'sender_psid, location, destination)'+
+        'VALUES (\''+sender_psid+'\', \''+data[sender_psid].location+'\', \''+data[sender_psid].destination+'\')';
+      client.query(query_str, (err, res) => {
+        console.log(err, res)
+        client.end()
+      });
+
+      console.log(data[sender_psid]);
+      let r = stage.indexOf(sender_psid);
+      stage.splice(r, 1);
+      data.splice(r, 1);
       break;
-    
   }
   
   // Sends the response message
@@ -174,46 +198,16 @@ function handlePostback(sender_psid, received_message) {
       response.text = "https://www.facebook.com/fidesupport/";
       break;
     case "get-ride":
-      response.text = "Enter your current location:";
+      response.text = "Enter your current location with zip code:";
       stage[sender_psid] = 1;
+      data[sender_psid] = {
+        "location": "...",
+        "destination": "..."
+      };
       break;
   }
 
   // Sends the response message
   callSendAPI(sender_psid, response);
 }
-
-//creating database Fide-passenger
-const pg = require('pg');
-
-const config = {
-  user: 'postgres',
-  database: 'F',
-  password: 'antikadas',
-  port: 5432                  //Default port, change it if needed
-};
-
-const pool = new pg.Pool(config);
-
-app.post('/data', (req, res, next) => {
-  const user = req.body
-
-   pool.connect(function (err, client, done) {
-       if (err) {
-           console.log("Can not connect to the DB" + err);
-       }
-       client.query('INSERT INTO data (id, current_location,destination) VALUES (sender_psid);', [user.name], function (err, result) {
-            done();
-            if (err) {
-                console.log(err);
-                res.status(400).send(err);
-            }
-            res.status(200).send(result.rows);
-       })
-   })
-});
-
-app.listen(4000, function () {
-    console.log('Server is running.. on Port 4000');
-});
 
