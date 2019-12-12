@@ -102,6 +102,7 @@ function callSendAPI(sender_psid, response) {
     "message": response
   }
 
+  console.log(request_body);
   // Send the HTTP request to the Messenger Platform
   request({
     "uri": "https://graph.facebook.com/v2.6/me/messages",
@@ -117,10 +118,17 @@ function callSendAPI(sender_psid, response) {
   }); 
 }
 
+var users = [];
 var stage = [];
 var data = [];
 
 function handleMessage(sender_psid, received_message) {
+
+  if(stage[sender_psid] == 2.5 && stage[sender_psid] == 3.5) {
+
+    console.log("PROCESSING IS IN PROGRESS, INGNORING INCOMING MESSAGES...");
+    return;
+  }
 
   let response;
 
@@ -165,19 +173,75 @@ function handleMessage(sender_psid, received_message) {
       response = {
         "text": "Please wait we are trying to find a driver for you nearby."
       }
-      stage[sender_psid] = 3;
 
-      client.connect();
-      const query_str = 'INSERT INTO public."passenger-feed"('+
-        'sender_psid, location, destination)'+
-        'VALUES (\''+sender_psid+'\', \''+data[sender_psid].location+'\', \''+data[sender_psid].destination+'\')';
-      client.query(query_str, (err, res) => {
-        console.log(err, res)
-        client.end()
-      });
+      // client.connect();
+      // const query_str = 'INSERT INTO public."passenger-feed"('+
+      //   'sender_psid, location, destination)'+
+      //   'VALUES (\''+sender_psid+'\', \''+data[sender_psid].location+'\', \''+data[sender_psid].destination+'\')';
+      // client.query(query_str, (err, res) => {
+      //   console.log(err, res)
+      //   client.end()
+      // });
 
-      console.log(data[sender_psid]);
-      let r = stage.indexOf(sender_psid);
+      setTimeout(function() {
+
+        let request_body = {
+          "recipient": {
+            "id": sender_psid
+          },
+          "sender_action":"typing_on"
+        };
+  
+        // Send the HTTP request to the Messenger Platform
+        request({
+          "uri": "https://graph.facebook.com/v2.6/me/messages",
+          "qs": { "access_token": PAGE_ACCESS_TOKEN },
+          "method": "POST",
+          "json": request_body
+        }, (err, res, body) => {
+          if (!err) {
+            console.log('message sent!')
+          } else {
+            console.error("Unable to send message:" + err);
+          }
+        });
+      }, 2500);
+
+      stage[sender_psid] = 2.5;
+      setTimeout(function() {
+
+        console.log("PROGESSING IS DONE");
+        stage[sender_psid] = 3;
+        handleMessage(sender_psid, received_message);
+      }, 5000);
+      break;
+    case 3:
+
+      stage[sender_psid] = 3.5;
+      response = {
+        "text": "There is 1 drived available...\nDriver: Pooya Panahandeh\n",
+      };
+      setTimeout(function() {
+
+        console.log("PROGESSING IS DONE");
+        stage[sender_psid] = 4;
+        handleMessage(sender_psid, received_message);
+      }, 2000);
+      break;
+    case 4:
+
+      response = {
+        "attachment":{
+          "type":"image", 
+          "payload":{
+            "url":"https://scontent-vie1-1.xx.fbcdn.net/v/t1.0-9/14915710_105380106610860_7797887482897586005_n.jpg?_nc_cat=110&_nc_ohc=GxLzbHTb7u0AQnfUr3r7aG9egJ1nRt_ur1FTXxzIK2bVosaRVSHALoicA&_nc_ht=scontent-vie1-1.xx&oh=775b96d5e7b21496184a79a6d93f39e0&oe=5E715190", 
+            "is_reusable":true
+          }
+        }
+      };
+
+      let r = users.indexOf(sender_psid);
+      users.splice(r, 1);
       stage.splice(r, 1);
       data.splice(r, 1);
       break;
@@ -199,6 +263,7 @@ function handlePostback(sender_psid, received_message) {
       break;
     case "get-ride":
       response.text = "Enter your current location with zip code:";
+      users.push(sender_psid);
       stage[sender_psid] = 1;
       data[sender_psid] = {
         "location": "...",
@@ -210,4 +275,3 @@ function handlePostback(sender_psid, received_message) {
   // Sends the response message
   callSendAPI(sender_psid, response);
 }
-
